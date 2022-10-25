@@ -59,6 +59,8 @@ return {
       group = augroup_tabline_update,
     })
 
+    vim.opt.showtabline = 2
+
     render.update()
   end,
 }
