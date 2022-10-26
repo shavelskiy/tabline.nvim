@@ -18,7 +18,7 @@ return {
   get_activity = function(bufnr)
     if vim.api.nvim_get_current_buf() == bufnr then
       return 2
-    elseif vim.fn.bufwinnr(bufnr) ~= -1 and vim.bo[vim.api.nvim_win_get_buf(0)].ft == 'NvimTree' then
+    elseif vim.fn.bufwinnr(bufnr) ~= -1 and utils.is_from_offset(0) then
       return 2
     end
 

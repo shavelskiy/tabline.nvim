@@ -3,6 +3,11 @@ return {
     return vim.fn.fnamemodify(path, ':t')
   end,
 
+  is_from_offset = function(win)
+    local filetype = vim.bo[vim.api.nvim_win_get_buf(win)].ft
+    return filetype == 'NvimTree' or filetype == 'git.nvim'
+  end,
+
   --- Return the index of element `n` in `list.
   --- @generic T
   --- @param list T[]

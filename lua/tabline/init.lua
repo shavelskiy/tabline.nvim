@@ -1,4 +1,5 @@
 local render = require 'tabline.render'
+local status, tree_events = pcall(require, 'nvim-tree.events')
 
 local function create_augroups()
   return vim.api.nvim_create_augroup('tabline', {}), vim.api.nvim_create_augroup('tabline_update', {})
@@ -42,6 +43,10 @@ return {
       end,
       group = augroup_tabline_update,
     })
+
+    if status then
+      tree_events.subscribe('Resize', render.update)
+    end
 
     vim.api.nvim_create_autocmd('WinClosed', {
       callback = function()

@@ -1,15 +1,17 @@
 local Buffer = require 'tabline.buffer'
+local utils = require 'tabline.utils'
 
 local state = {
   buffers = {},
   buffers_by_id = {},
   get_offset = function()
+    local result = 0
     for _, win in pairs(vim.api.nvim_tabpage_list_wins(0)) do
-      if vim.bo[vim.api.nvim_win_get_buf(win)].ft == 'NvimTree' then
-        return vim.api.nvim_win_get_width(win) + 1
+      if utils.is_from_offset(win) then
+        result = result + vim.api.nvim_win_get_width(win) + 1
       end
     end
-    return 0
+    return result
   end,
 }
 
