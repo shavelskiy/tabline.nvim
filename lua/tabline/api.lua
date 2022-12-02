@@ -59,36 +59,9 @@ return {
     render.update()
   end,
 
-  order_by_directory = function()
-    table.sort(state.buffers, function(a, b)
-      local name_of_a = vim.api.nvim_buf_get_name(a)
-      local name_of_b = vim.api.nvim_buf_get_name(b)
-      local a_less_than_b = name_of_b < name_of_a
-
-      local level_of_a = #vim.split(name_of_a, '/')
-      local level_of_b = #vim.split(name_of_b, '/')
-
-      if level_of_a ~= level_of_b then
-        return level_of_a < level_of_b
-      end
-
-      return a_less_than_b
-    end)
-
-    render.update()
-  end,
-
   order_by_language = function()
     table.sort(state.buffers, function(a, b)
       return vim.api.nvim_buf_get_option(a, 'filetype') < vim.api.nvim_buf_get_option(b, 'filetype')
-    end)
-
-    render.update()
-  end,
-
-  order_by_window_number = function()
-    table.sort(state.buffers, function(a, b)
-      return vim.fn.bufwinnr(vim.api.nvim_buf_get_name(a)) < vim.fn.bufwinnr(vim.api.nvim_buf_get_name(b))
     end)
 
     render.update()
