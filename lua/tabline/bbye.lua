@@ -1,19 +1,17 @@
-local command = vim.api.nvim_command
 local get_current_buf = vim.api.nvim_get_current_buf
-local notify = vim.notify
 
 local state = require 'tabline.state'
 local utils = require 'tabline.utils'
 
 local function err(msg)
-  notify(msg, vim.log.levels.ERROR, { title = 'bbye' })
+  vim.notify(msg, vim.log.levels.ERROR, { title = 'bbye' })
   vim.v.errmsg = msg
 end
 
 local empty_buffer = nil
 
 local function new()
-  command 'enew'
+  vim.api.nvim_command 'enew'
 
   empty_buffer = get_current_buf()
   vim.b.empty_buffer = true
@@ -46,8 +44,7 @@ return {
 
     local current_window = vim.api.nvim_get_current_win()
 
-    local window_ids = vim.api.nvim_list_wins()
-    local window_ids_reversed = utils.reverse(window_ids)
+    local window_ids_reversed = utils.reverse(vim.api.nvim_list_wins())
 
     for _, window_number in ipairs(window_ids_reversed) do
       if vim.api.nvim_win_get_buf(window_number) == buffer_number then
@@ -58,7 +55,7 @@ return {
           if previous_buffer > 0 and vim.fn.buflisted(previous_buffer) == 1 then
             vim.api.nvim_set_current_buf(previous_buffer)
           else
-            command 'bprevious'
+            vim.api.nvim_command 'bprevious'
           end
         end)
 
