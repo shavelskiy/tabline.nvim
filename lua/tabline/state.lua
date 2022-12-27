@@ -43,12 +43,6 @@ function state.get_buffer_list()
   return result
 end
 
--- Open/close buffers
-
---- Stop tracking the `bufnr` with barbar.
---- WARN: does NOT close the buffer in Neovim (see `:h nvim_buf_delete`)
---- @param bufnr integer
---- @param do_name_update? boolean refreshes all buffer names iff `true`
 function state.close_buffer(bufnr, do_name_update)
   state.buffers = vim.tbl_filter(function(b)
     return b ~= bufnr
@@ -60,11 +54,9 @@ function state.close_buffer(bufnr, do_name_update)
   end
 end
 
---- Update the names of all buffers in the bufferline.
 function state.update_names()
   local buffer_index_by_name = {}
 
-  -- Compute names
   for i, buffer_n in ipairs(state.buffers) do
     local name = Buffer.get_name(buffer_n)
 

@@ -2,7 +2,6 @@ local utils = require 'tabline.utils'
 
 local maximum_length = 30
 
---- The character used to delimit paths (e.g. `/` or `\`).
 local separator = package.config:sub(1, 1)
 
 local function terminalname(name)
@@ -26,7 +25,6 @@ return {
   end,
 
   get_name = function(bufnr)
-    --- @type nil|string
     local name = vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_buf_get_name(bufnr) or nil
 
     if name then
@@ -48,7 +46,6 @@ return {
         name = name:sub(1, maximum_length - #ellipsis) .. ellipsis
       end
 
-      -- safety to prevent recursion in any future edge case
       name = name:sub(1, maximum_length)
     end
 

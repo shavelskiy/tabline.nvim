@@ -5,15 +5,6 @@ local maximum_padding, minimum_padding = 4, 2
 
 local SIDES_OF_BUFFER = 2
 
---- @class tabline.layout.data
---- @field actual_width integer
---- @field available_width integer
---- @field base_widths integer[]
---- @field buffers_width integer
---- @field padding_width integer
---- @field tabpages_width integer
---- @field used_width integer
-
 local calculate_tabpages_width = function()
   local result, number_of_tabs = 0, vim.fn.tabpagenr '$'
 
@@ -52,8 +43,6 @@ local calculate_buffers_width = function()
 end
 
 return {
-  --- Calculate the current layout of the tabline.
-  --- @return tabline.layout.data
   calculate = function()
     local used_width, base_widths = calculate_buffers_width()
 

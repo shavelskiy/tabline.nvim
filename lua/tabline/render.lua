@@ -10,22 +10,14 @@ local utils = require 'tabline.utils'
 
 local HL_BY_ACTIVITY = { 'Inactive', 'Current' }
 
---- @type nil|string
 local last_tabline
 
 local function hl_tabline(group)
   return '%#' .. group .. '#'
 end
 
---- @class tabline.render.group
---- @field hl string the highlight group to use
---- @field text string the content being rendered
-
 local scroll = 0
 
---- Concatenates some `groups` into a valid string.
---- @param groups tabline.render.group[]
---- @return string
 local function groups_to_string(groups)
   local result = ''
 
@@ -36,10 +28,6 @@ local function groups_to_string(groups)
   return result
 end
 
---- Insert `others` into `groups` at the `position`.
---- @param groups tabline.render.group[]
---- @param position integer
---- @return tabline.render.group[] with_insertions
 local function groups_insert(groups, position, others)
   local current_position = 0
 
@@ -50,17 +38,13 @@ local function groups_insert(groups, position, others)
     local group = groups[i]
     local group_width = strwidth(group.text)
 
-    -- While we haven't found the position...
     if current_position + group_width <= position then
       new_groups[#new_groups + 1] = group
       i = i + 1
       current_position = current_position + group_width
-
-      -- When we found the position...
     else
       local available_width = position - current_position
 
-      -- Slice current group if it `position` is inside it
       if available_width > 0 then
         new_groups[#new_groups + 1] = {
           text = strcharpart(group.text, 0, available_width),
@@ -68,7 +52,6 @@ local function groups_insert(groups, position, others)
         }
       end
 
-      -- Add new other groups
       local others_width = 0
       for _, other in ipairs(others) do
         local other_width = strwidth(other.text)
@@ -78,8 +61,6 @@ local function groups_insert(groups, position, others)
 
       local end_position = position + others_width
 
-      -- Then, resume adding previous groups
-      -- table.insert(new_groups, 'then')
       while i <= #groups do
         local previous_group = groups[i]
         local previous_group_width = strwidth(previous_group.text)
@@ -109,9 +90,6 @@ local function groups_insert(groups, position, others)
   return new_groups
 end
 
---- Select from `groups` while fitting within the provided `width`, discarding all indices larger than the last index that fits.
---- @param groups tabline.render.group[]
---- @param width integer
 local function slice_groups_right(groups, width)
   local accumulated_width = 0
 
@@ -134,9 +112,6 @@ local function slice_groups_right(groups, width)
   return new_groups
 end
 
---- Select from `groups` in reverse while fitting within the provided `width`, discarding all indices less than the last index that fits.
---- @param groups tabline.render.group[]
---- @param width integer
 local function slice_groups_left(groups, width)
   local accumulated_width = 0
 
@@ -160,22 +135,14 @@ local function slice_groups_left(groups, width)
   return new_groups
 end
 
---- @class tabline.render
 local render = {}
 
---- Stop tracking the `bufnr` with barbar, and update the tabline.
---- WARN: does NOT close the buffer in Neovim (see `:h nvim_buf_delete`)
---- @param bufnr integer
---- @param do_name_update? boolean refreshes all buffer names iff `true`
 function render.close_buffer(bufnr, do_name_update)
   state.close_buffer(bufnr, do_name_update)
   render.update()
 end
 
---- Open the `new_buffers` in the tabline.
 local function open_buffers(new_buffers)
-  -- Open next to the currently opened tab
-  -- Find the new index where the tab will be inserted
   local new_index = utils.index_of(state.buffers, state.last_current_buffer)
   if new_index ~= nil then
     new_index = new_index + 1
@@ -183,12 +150,10 @@ local function open_buffers(new_buffers)
     new_index = #state.buffers + 1
   end
 
-  -- Insert the buffers where they go
   for _, new_buffer in ipairs(new_buffers) do
     if utils.index_of(state.buffers, new_buffer) == nil then
       local actual_index = new_index
-        -- We add special buffers at the end
-        or buf_get_option(new_buffer, 'buftype') ~= ''
+          or buf_get_option(new_buffer, 'buftype') ~= ''
 
       actual_index = #state.buffers + 1
 
@@ -197,17 +162,14 @@ local function open_buffers(new_buffers)
   end
 end
 
---- Refresh the buffer list.
 function render.get_updated_buffers(update_names)
   local current_buffers = state.get_buffer_list()
   local new_buffers = vim.tbl_filter(function(b)
     return not vim.tbl_contains(state.buffers, b)
   end, current_buffers)
 
-  -- To know if we need to update names
   local did_change = false
 
-  -- Remove closed or update closing buffers
   local closed_buffers = vim.tbl_filter(function(b)
     return not vim.tbl_contains(current_buffers, b)
   end, state.buffers)
@@ -218,7 +180,6 @@ function render.get_updated_buffers(update_names)
     render.close_buffer(buffer_number)
   end
 
-  -- Add new buffers
   if #new_buffers > 0 then
     did_change = true
 
@@ -236,18 +197,16 @@ function render.get_updated_buffers(update_names)
   return state.buffers
 end
 
---- @return integer current_bufnr
 function render.set_current_win_listed_buffer()
   local current = vim.api.nvim_get_current_buf()
   local is_listed = buf_get_option(current, 'buflisted')
 
-  -- Check previous window first
   if not is_listed then
     vim.api.nvim_command 'wincmd p'
     current = vim.api.nvim_get_current_buf()
     is_listed = buf_get_option(current, 'buflisted')
   end
-  -- Check all windows now
+
   if not is_listed then
     local wins = vim.api.nvim_list_wins()
     for _, win in ipairs(wins) do
@@ -278,7 +237,6 @@ end
 render.generate_tabline = function(bufnrs)
   local current = vim.api.nvim_get_current_buf()
 
-  -- Store current buffer to open new ones next to this one
   if buf_get_option(current, 'buflisted') then
     if vim.b.empty_buffer then
       state.last_current_buffer = nil
@@ -367,7 +325,6 @@ render.generate_tabline = function(bufnrs)
   return result .. groups_to_string(bufferline_groups) .. hl_tabline 'BufferTabpageFill' .. tablist()
 end
 
---- @param update_names? boolean whether to refresh the names of the buffers (default: `false`)
 function render.update(update_names)
   local result = render.generate_tabline(render.get_updated_buffers(update_names))
   if result ~= last_tabline then
