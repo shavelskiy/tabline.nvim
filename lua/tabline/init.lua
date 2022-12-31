@@ -1,71 +1,51 @@
-local render = require 'tabline.render'
-local status, tree_events = pcall(require, 'nvim-tree.events')
-
-local function create_augroups()
-  return vim.api.nvim_create_augroup('tabline', {}), vim.api.nvim_create_augroup('tabline_update', {})
-end
-
-local augroup_tablien, augroup_tabline_update = create_augroups()
+local is_buf_valid = require('tabline.api').is_buf_valid
 
 return {
   setup = function()
-    vim.api.nvim_create_autocmd('BufModifiedSet', {
-      callback = function(tbl)
-        local is_modified = vim.api.nvim_buf_get_option(tbl.buf, 'modified')
-        if is_modified ~= vim.b[tbl.buf].checked then
-          vim.api.nvim_buf_set_var(tbl.buf, 'checked', is_modified)
-          render.update()
+    -- store listed buffers in tab local var
+    vim.t.bufs = vim.api.nvim_list_bufs()
+
+    -- autocmds for tabufline -> store bufnrs on bufadd, bufenter events
+    -- thx to https://github.com/ii14 & stores buffer per tab -> table
+    vim.api.nvim_create_autocmd({ 'BufAdd', 'BufEnter', 'tabnew' }, {
+      callback = function(args)
+        if vim.t.bufs == nil then
+          vim.t.bufs = vim.api.nvim_get_current_buf() == args.buf and {} or { args.buf }
+        else
+          local bufs = vim.t.bufs
+
+          -- check for duplicates
+          if
+            not vim.tbl_contains(bufs, args.buf)
+            and (args.event == 'BufEnter' or vim.bo[args.buf].buflisted)
+            and (args.event == 'BufEnter' or args.buf ~= vim.api.nvim_get_current_buf())
+            and is_buf_valid(args.buf)
+          then
+            table.insert(bufs, args.buf)
+            vim.t.bufs = bufs
+          end
         end
       end,
-      group = augroup_tablien,
     })
 
-    vim.api.nvim_create_autocmd({ 'BufNew', 'BufEnter' }, {
-      callback = function()
-        render.update(true)
+    vim.api.nvim_create_autocmd('BufDelete', {
+      callback = function(args)
+        for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+          local bufs = vim.t[tab].bufs
+          if bufs then
+            for i, bufnr in ipairs(bufs) do
+              if bufnr == args.buf then
+                table.remove(bufs, i)
+                vim.t[tab].bufs = bufs
+                break
+              end
+            end
+          end
+        end
       end,
-      group = augroup_tabline_update,
-    })
-
-    vim.api.nvim_create_autocmd({
-      'BufEnter',
-      'BufWinEnter',
-      'BufWinLeave',
-      'BufWritePost',
-      'SessionLoadPost',
-      'TabEnter',
-      'VimResized',
-      'WinEnter',
-      'WinLeave',
-    }, {
-      callback = function()
-        render.update()
-      end,
-      group = augroup_tabline_update,
-    })
-
-    if status then
-      tree_events.subscribe('Resize', render.update)
-    end
-
-    vim.api.nvim_create_autocmd('WinClosed', {
-      callback = function()
-        vim.schedule(render.update)
-      end,
-      group = augroup_tabline_update,
-    })
-
-    vim.api.nvim_create_autocmd('TermOpen', {
-      callback = function()
-        vim.defer_fn(function()
-          render.update(true)
-        end, 500)
-      end,
-      group = augroup_tabline_update,
     })
 
     vim.opt.showtabline = 2
-
-    render.update()
+    vim.opt.tabline = "%!v:lua.require('tabline.render')()"
   end,
 }

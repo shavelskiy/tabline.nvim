@@ -1,69 +1,88 @@
-local render = require 'tabline.render'
-local state = require 'tabline.state'
-local utils = require 'tabline.utils'
+local M = {}
+local api = vim.api
 
-return {
-  goto_buffer = function(index)
-    if index < 0 then
-      index = #state.buffers + index + 1
-    else
-      index = math.min(index, #state.buffers)
+M.is_buf_valid = function(bufnr) return vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buflisted end
+
+local bufilter = function()
+  local bufs = vim.t.bufs or nil
+
+  if not bufs then return {} end
+
+  for i = #bufs, 1, -1 do
+    if not M.is_buf_valid(bufs[i]) then table.remove(bufs, i) end
+  end
+
+  return bufs
+end
+
+M.next_tab = function()
+  local bufs = bufilter() or {}
+
+  for i, v in ipairs(bufs) do
+    if api.nvim_get_current_buf() == v then
+      vim.cmd(i == #bufs and 'b' .. bufs[1] or 'b' .. bufs[i + 1])
+      break
     end
+  end
+end
 
-    vim.api.nvim_set_current_buf(state.buffers[math.max(1, index)])
-  end,
+M.prev_tab = function()
+  local bufs = bufilter() or {}
 
-  goto_buffer_relative = function(steps)
-    render.get_updated_buffers()
-
-    local current = render.set_current_win_listed_buffer()
-
-    local idx = utils.index_of(state.buffers, current)
-
-    if idx == nil then
-      return
-    else
-      idx = (idx + steps - 1) % #state.buffers + 1
+  for i, v in ipairs(bufs) do
+    if api.nvim_get_current_buf() == v then
+      vim.cmd(i == 1 and 'b' .. bufs[#bufs] or 'b' .. bufs[i - 1])
+      break
     end
+  end
+end
 
-    vim.api.nvim_set_current_buf(state.buffers[idx])
-  end,
+M.close_buffer = function(bufnr)
+  if vim.bo.buftype == 'terminal' then
+    vim.cmd(vim.bo.buflisted and 'set nobl | enew' or 'hide')
+  else
+    bufnr = bufnr or api.nvim_get_current_buf()
+    M.prev_tab()
+    vim.cmd('confirm bd' .. bufnr)
+  end
+end
 
-  move_current_buffer = function(steps)
-    render.update()
+M.move_buf = function(n)
+  local bufs = vim.t.bufs
 
-    local current_bufnr = vim.api.nvim_get_current_buf()
-    local idx = utils.index_of(state.buffers, current_bufnr)
+  for i, bufnr in ipairs(bufs) do
+    if bufnr == vim.api.nvim_get_current_buf() then
+      if n < 0 and i == 1 or n > 0 and i == #bufs then
+        bufs[1], bufs[#bufs] = bufs[#bufs], bufs[1]
+      else
+        bufs[i], bufs[i + n] = bufs[i + n], bufs[i]
+      end
 
-    if idx == nil then
-      return
+      break
     end
+  end
 
-    local to_idx = math.max(1, math.min(#state.buffers, idx + steps))
-    if to_idx == idx then
-      return
-    end
+  vim.t.bufs = bufs
+  vim.cmd 'redrawtabline'
+end
 
-    local bufnr = state.buffers[idx]
+M.pick = function()
+  vim.g.tbufpick_showNums = true
+  vim.cmd 'redrawtabline'
 
-    table.remove(state.buffers, idx)
-    table.insert(state.buffers, to_idx, bufnr)
+  local key = tonumber(vim.fn.nr2char(vim.fn.getchar()))
+  local bufid = vim.t.bufs[(key and key or 0) + vim.g.bufirst]
+  if key and bufid then
+    vim.cmd('b' .. bufid)
+    api.nvim_echo({ { '' } }, false, {})
+    vim.cmd 'redraw'
+  else
+    vim.cmd 'redraw'
+    print 'bufpick cancelled, press a number key!'
+  end
 
-    render.update()
-  end,
+  vim.g.tbufpick_showNums = false
+  vim.cmd 'redrawtabline'
+end
 
-  order_by_buffer_number = function()
-    table.sort(state.buffers, function(a, b)
-      return a < b
-    end)
-    render.update()
-  end,
-
-  order_by_language = function()
-    table.sort(state.buffers, function(a, b)
-      return vim.api.nvim_buf_get_option(a, 'filetype') < vim.api.nvim_buf_get_option(b, 'filetype')
-    end)
-
-    render.update()
-  end,
-}
+return M
