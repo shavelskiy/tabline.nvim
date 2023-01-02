@@ -1,15 +1,21 @@
 local M = {}
 local api = vim.api
 
-M.is_buf_valid = function(bufnr) return vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buflisted end
+M.is_buf_valid = function(bufnr)
+  return vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buflisted
+end
 
 local bufilter = function()
   local bufs = vim.t.bufs or nil
 
-  if not bufs then return {} end
+  if not bufs then
+    return {}
+  end
 
   for i = #bufs, 1, -1 do
-    if not M.is_buf_valid(bufs[i]) then table.remove(bufs, i) end
+    if not M.is_buf_valid(bufs[i]) then
+      table.remove(bufs, i)
+    end
   end
 
   return bufs

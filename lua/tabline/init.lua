@@ -45,6 +45,7 @@ return {
       end,
     })
 
+    require 'tabline.render'()
     vim.opt.showtabline = 2
     vim.opt.tabline = "%!v:lua.require('tabline.render')()"
   end,

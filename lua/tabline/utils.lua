@@ -1,4 +1,6 @@
-local list_slice_from_end = function(list, index_from_end) return vim.list_slice(list, #list - index_from_end + 1) end
+local list_slice_from_end = function(list, index_from_end)
+  return vim.list_slice(list, #list - index_from_end + 1)
+end
 
 local separator = package.config:sub(1, 1)
 
