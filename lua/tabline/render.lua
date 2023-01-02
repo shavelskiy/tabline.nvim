@@ -48,7 +48,7 @@ local bufferlist = function()
       local name = value:gsub('', '(' .. index .. ')')
       table.insert(buffers, name)
     end
-    return table.concat(buffers) .. '%#TblineFill#' .. '%='
+    return table.concat(buffers) .. '%#TablineFill#' .. '%='
   end
 
   vim.g.bufirst = 0
@@ -69,7 +69,7 @@ local bufferlist = function()
   end
 
   vim.g.visibuffers = buffers
-  return table.concat(buffers) .. '%#TblineFill#%='
+  return table.concat(buffers) .. '%#TablineFill#%='
 end
 
 local tablist = function()
@@ -77,7 +77,7 @@ local tablist = function()
 
   if number_of_tabs > 1 then
     for i = 1, number_of_tabs, 1 do
-      local tab_hl = ((i == vim.fn.tabpagenr()) and '%#TbLineTabOn# ') or '%#TbLineTabOff# '
+      local tab_hl = ((i == vim.fn.tabpagenr()) and '%#TablineTabOn# ') or '%#TablineTabOff# '
       result = result .. tab_hl .. i .. ' '
     end
   end
