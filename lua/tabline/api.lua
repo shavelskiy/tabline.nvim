@@ -81,9 +81,7 @@ M.pick = function()
   local bufid = vim.t.bufs[(key and key or 0)]
   if key and bufid then
     vim.cmd('b' .. bufid)
-    api.nvim_echo({ { '' } }, false, {})
   end
-  vim.cmd 'redraw'
 
   vim.g.tabline_show_pick = false
   vim.cmd 'redrawtabline'

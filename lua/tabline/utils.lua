@@ -3,6 +3,7 @@ local list_slice_from_end = function(list, index_from_end)
 end
 
 local separator = package.config:sub(1, 1)
+local chars = 'abcdefghijklmnopqrstuvwxyz'
 
 return {
   get_unique_name = function(bufnr, second_bufnr)
@@ -25,9 +26,10 @@ return {
     return first_result
   end,
   number_to_char = function(number)
-    return 'a'
+    return string.sub(chars, number, number)
   end,
   char_to_number = function(char)
-    return 1
+    local i, j = string.find(chars, char)
+    return i
   end,
 }

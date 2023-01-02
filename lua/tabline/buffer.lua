@@ -41,6 +41,10 @@ local update_name = function(name, bufnr)
 end
 
 local get_pick_data = function(bufnr)
+  if vim.g.tabline_show_pick ~= true then
+    return nil
+  end
+
   local char = '-'
   for i, buffer in ipairs(vim.t.bufs) do
     if buffer == bufnr then
@@ -48,14 +52,7 @@ local get_pick_data = function(bufnr)
     end
   end
 
-  if vim.g.tabline_show_pick == true then
-    return {
-      char = char,
-      hl = '%#TablinePick#',
-    }
-  end
-
-  return nil
+  return '%#TablinePick#' .. char
 end
 
 local get_highlight = function(bufnr)
@@ -94,8 +91,14 @@ return {
   get_buffer_tab = function(bufnr)
     local parts = get_parts(bufnr)
 
-    local finish = parts.pick == nil and parts.icon.close_icon or (parts.pick.hl .. parts.pick.char)
-
-    return parts.icon.hl .. '   ' .. parts.icon.icon .. ' ' .. parts.hl .. parts.name .. '   ' .. finish .. ' '
+    return parts.icon.hl
+      .. '   '
+      .. parts.icon.icon
+      .. ' '
+      .. parts.hl
+      .. parts.name
+      .. '   '
+      .. (parts.pick == nil and parts.icon.close_icon or parts.pick)
+      .. ' '
   end,
 }
