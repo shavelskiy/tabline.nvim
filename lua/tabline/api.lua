@@ -1,5 +1,6 @@
 local M = {}
 local api = vim.api
+local utils = require 'tabline.utils'
 
 M.is_buf_valid = function(bufnr)
   return vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buflisted
@@ -73,21 +74,18 @@ M.move_buf = function(n)
 end
 
 M.pick = function()
-  vim.g.tbufpick_showNums = true
+  vim.g.tabline_show_pick = true
   vim.cmd 'redrawtabline'
 
-  local key = tonumber(vim.fn.nr2char(vim.fn.getchar()))
-  local bufid = vim.t.bufs[(key and key or 0) + vim.g.bufirst]
+  local key = utils.char_to_number(vim.fn.nr2char(vim.fn.getchar()))
+  local bufid = vim.t.bufs[(key and key or 0)]
   if key and bufid then
     vim.cmd('b' .. bufid)
     api.nvim_echo({ { '' } }, false, {})
-    vim.cmd 'redraw'
-  else
-    vim.cmd 'redraw'
-    print 'bufpick cancelled, press a number key!'
   end
+  vim.cmd 'redraw'
 
-  vim.g.tbufpick_showNums = false
+  vim.g.tabline_show_pick = false
   vim.cmd 'redrawtabline'
 end
 

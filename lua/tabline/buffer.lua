@@ -19,7 +19,11 @@ local get_icon = function(name, bufnr)
   local icon, icon_hl = devicons.get_icon(name, string.match(name, '%a+$'), { default = true })
 
   return {
-    hl = new_hl(icon_hl, vim.api.nvim_get_current_buf() == bufnr and 'TablineBufOn' or 'TablineBufOff'),
+    hl = new_hl(
+      icon_hl,
+      (vim.api.nvim_get_current_buf() == bufnr and vim.g.tabline_show_pick ~= true) and 'TablineBufOn'
+        or 'TablineBufOff'
+    ),
     icon = icon,
   }
 end
@@ -37,10 +41,17 @@ local update_name = function(name, bufnr)
 end
 
 local get_pick_data = function(bufnr)
-  if vim.g.tbufpick_showNums then
+  local char = '-'
+  for i, buffer in ipairs(vim.t.bufs) do
+    if buffer == bufnr then
+      char = utils.number_to_char(i)
+    end
+  end
+
+  if vim.g.tabline_show_pick == true then
     return {
-      char = 'A',
-      hl = bufnr == vim.api.nvim_get_current_buf() and '%#TablinePickOn#' or '%#TablinePickOff#',
+      char = char,
+      hl = '%#TablinePick#',
     }
   end
 
@@ -48,6 +59,10 @@ local get_pick_data = function(bufnr)
 end
 
 local get_highlight = function(bufnr)
+  if vim.g.tabline_show_pick == true then
+    return '%#TablineBufOff#'
+  end
+
   if bufnr == vim.api.nvim_get_current_buf() then
     return vim.bo[bufnr].modified and '%#TablineBufOnModified#' or '%#TablineBufOn#'
   end

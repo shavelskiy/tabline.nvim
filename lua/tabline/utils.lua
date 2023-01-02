@@ -24,4 +24,10 @@ return {
 
     return first_result
   end,
+  number_to_char = function(number)
+    return 'a'
+  end,
+  char_to_number = function(char)
+    return 1
+  end,
 }

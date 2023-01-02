@@ -43,15 +43,6 @@ local bufferlist = function()
   local current_buf = vim.api.nvim_get_current_buf()
   local has_current = false
 
-  -- if vim.g.tbufpick_showNums then
-  --   for index, value in ipairs(vim.g.visibuffers) do
-  --     local name = value:gsub('', '(' .. index .. ')')
-  --     table.insert(buffers, name)
-  --   end
-  --   return table.concat(buffers) .. '%#TablineFill#' .. '%='
-  -- end
-
-  vim.g.bufirst = 0
   for _, bufnr in ipairs(vim.t.bufs) do
     if is_buf_valid(bufnr) then
       if (get_buffer_width(buffers)) > available_space then
@@ -59,7 +50,6 @@ local bufferlist = function()
           break
         end
 
-        vim.g.bufirst = vim.g.bufirst + 1
         table.remove(buffers, 1)
       end
 
@@ -68,7 +58,6 @@ local bufferlist = function()
     end
   end
 
-  vim.g.visibuffers = buffers
   return table.concat(buffers) .. '%#TablineFill#%='
 end
 
