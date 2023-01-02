@@ -70,10 +70,10 @@ return {
     return parts.icon.hl
       .. '   '
       .. parts.icon.icon
-      .. parts.hl
       .. ' '
+      .. parts.hl
       .. parts.name
-      .. '  '
+      .. '   '
       .. parts.icon.close_icon
       .. ' '
   end,
