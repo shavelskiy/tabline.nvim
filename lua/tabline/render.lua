@@ -43,13 +43,13 @@ local bufferlist = function()
   local current_buf = vim.api.nvim_get_current_buf()
   local has_current = false
 
-  if vim.g.tbufpick_showNums then
-    for index, value in ipairs(vim.g.visibuffers) do
-      local name = value:gsub('', '(' .. index .. ')')
-      table.insert(buffers, name)
-    end
-    return table.concat(buffers) .. '%#TablineFill#' .. '%='
-  end
+  -- if vim.g.tbufpick_showNums then
+  --   for index, value in ipairs(vim.g.visibuffers) do
+  --     local name = value:gsub('', '(' .. index .. ')')
+  --     table.insert(buffers, name)
+  --   end
+  --   return table.concat(buffers) .. '%#TablineFill#' .. '%='
+  -- end
 
   vim.g.bufirst = 0
   for _, bufnr in ipairs(vim.t.bufs) do

@@ -36,6 +36,17 @@ local update_name = function(name, bufnr)
   return name
 end
 
+local get_pick_data = function(bufnr)
+  if vim.g.tbufpick_showNums then
+    return {
+      char = 'A',
+      hl = bufnr == vim.api.nvim_get_current_buf() and '%#TablinePickOn#' or '%#TablinePickOff#',
+    }
+  end
+
+  return nil
+end
+
 local get_highlight = function(bufnr)
   if bufnr == vim.api.nvim_get_current_buf() then
     return vim.bo[bufnr].modified and '%#TablineBufOnModified#' or '%#TablineBufOn#'
@@ -59,6 +70,7 @@ local get_parts = function(bufnr)
       close_icon = vim.bo[bufnr].modified and '' or '',
     },
     hl = get_highlight(bufnr),
+    pick = get_pick_data(bufnr),
     name = update_name(name, bufnr),
   }
 end
@@ -67,14 +79,8 @@ return {
   get_buffer_tab = function(bufnr)
     local parts = get_parts(bufnr)
 
-    return parts.icon.hl
-      .. '   '
-      .. parts.icon.icon
-      .. ' '
-      .. parts.hl
-      .. parts.name
-      .. '   '
-      .. parts.icon.close_icon
-      .. ' '
+    local finish = parts.pick == nil and parts.icon.close_icon or (parts.pick.hl .. parts.pick.char)
+
+    return parts.icon.hl .. '   ' .. parts.icon.icon .. ' ' .. parts.hl .. parts.name .. '   ' .. finish .. ' '
   end,
 }
