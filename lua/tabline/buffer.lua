@@ -67,38 +67,25 @@ local get_highlight = function(bufnr)
   return vim.bo[bufnr].modified and '%#TablineBufOffModified#' or '%#TablineBufOff#'
 end
 
-local get_parts = function(bufnr)
-  local name = (#vim.api.nvim_buf_get_name(bufnr) ~= 0) and vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':t')
-    or ' No Name '
-
-  local icon_data = get_icon(name, bufnr)
-
-  name = (#name > 40 and string.sub(name, 1, 30) .. '..') or name
-
-  return {
-    icon = {
-      hl = icon_data.hl,
-      icon = icon_data.icon,
-      close_icon = vim.bo[bufnr].modified and '' or '',
-    },
-    hl = get_highlight(bufnr),
-    pick = get_pick_data(bufnr),
-    name = update_name(name, bufnr),
-  }
-end
-
 return {
-  get_buffer_tab = function(bufnr)
-    local parts = get_parts(bufnr)
+  get_parts = function(bufnr)
+    local name = (#vim.api.nvim_buf_get_name(bufnr) ~= 0) and vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':t')
+      or ' No Name '
 
-    return parts.icon.hl
-      .. '   '
-      .. parts.icon.icon
-      .. ' '
-      .. parts.hl
-      .. parts.name
-      .. '   '
-      .. (parts.pick == nil and parts.icon.close_icon or parts.pick)
-      .. ' '
+    local icon_data = get_icon(name, bufnr)
+
+    name = (#name > 40 and string.sub(name, 1, 30) .. '..') or name
+
+    return {
+      icon = {
+        hl = icon_data.hl,
+        icon = icon_data.icon,
+        close_icon = vim.bo[bufnr].modified and '' or '',
+      },
+      hl = get_highlight(bufnr),
+      pick = get_pick_data(bufnr),
+      name = update_name(name, bufnr),
+      forse_size = nil,
+    }
   end,
 }
