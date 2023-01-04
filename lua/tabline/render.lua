@@ -1,4 +1,5 @@
 local buffer_render = require 'tabline.buffer_render'
+local buffer_list = require 'tabline.buffer_list'
 
 local get_offset = function()
   local result = 0
@@ -30,8 +31,8 @@ local bufferlist = function()
   local available_space = vim.o.columns - get_offset() - get_buttons_width()
 
   local buffers = {}
-  for _, parts in ipairs(buffer_render.get_buffer_parts(available_space)) do
-    table.insert(buffers, buffer_render.render(parts))
+  for _, parts in ipairs(buffer_list(available_space)) do
+    table.insert(buffers, buffer_render(parts))
   end
 
   return table.concat(buffers) .. '%#TablineFill#%='

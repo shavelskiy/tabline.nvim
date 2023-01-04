@@ -29,7 +29,7 @@ return {
     return string.sub(chars, number, number)
   end,
   char_to_number = function(char)
-    local i, j = string.find(chars, char)
+    local i, _ = string.find(chars, char)
     return i
   end,
 }
