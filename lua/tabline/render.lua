@@ -1,6 +1,4 @@
-local buffer_utils = require 'tabline.buffer'
 local buffer_render = require 'tabline.buffer_render'
-local is_buf_valid = require('tabline.api').is_buf_valid
 
 local get_offset = function()
   local result = 0
@@ -28,45 +26,11 @@ local cover_nvim_tree = function()
   return '%#NvimTreeNormal#' .. string.rep(' ', get_offset())
 end
 
-local get_buffer_width = function(buffers_parts)
-  local result = 0
-
-  for _, parts in ipairs(buffers_parts) do
-    result = result + buffer_render.get_length(parts)
-  end
-
-  return result
-end
-
 local bufferlist = function()
-  local buffers_parts = {}
-  local current_parts = nil
   local available_space = vim.o.columns - get_offset() - get_buttons_width()
-  local current_buf = vim.api.nvim_get_current_buf()
-  local has_current = false
-
-  for _, bufnr in ipairs(vim.t.bufs) do
-    if is_buf_valid(bufnr) then
-      current_parts = buffer_utils.get_parts(bufnr)
-      if get_buffer_width(buffers_parts) + buffer_render.get_length(current_parts) > available_space then
-        if has_current then
-          current_parts.forse_size = get_buffer_width(buffers_parts)
-            + buffer_render.get_length(current_parts)
-            - available_space
-          table.insert(buffers_parts, current_parts)
-          break
-        end
-
-        table.remove(buffers_parts, 1)
-      end
-
-      has_current = bufnr == current_buf and true or has_current
-      table.insert(buffers_parts, current_parts)
-    end
-  end
 
   local buffers = {}
-  for _, parts in ipairs(buffers_parts) do
+  for _, parts in ipairs(buffer_render.get_buffer_parts(available_space)) do
     table.insert(buffers, buffer_render.render(parts))
   end
 

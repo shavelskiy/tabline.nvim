@@ -4,6 +4,7 @@ return {
   setup = function()
     -- store listed buffers in tab local var
     vim.t.bufs = vim.api.nvim_list_bufs()
+    vim.g.tabline_offset = 0
 
     -- autocmds for tabufline -> store bufnrs on bufadd, bufenter events
     -- thx to https://github.com/ii14 & stores buffer per tab -> table

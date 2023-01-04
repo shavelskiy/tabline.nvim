@@ -73,6 +73,7 @@ return {
       or ' No Name '
 
     local icon_data = get_icon(name, bufnr)
+    local pick = get_pick_data(bufnr)
 
     name = (#name > 40 and string.sub(name, 1, 30) .. '..') or name
 
@@ -80,10 +81,9 @@ return {
       icon = {
         hl = icon_data.hl,
         icon = icon_data.icon,
-        close_icon = vim.bo[bufnr].modified and '' or '',
+        close_icon = pick ~= nil and pick or vim.bo[bufnr].modified and '' or '',
       },
       hl = get_highlight(bufnr),
-      pick = get_pick_data(bufnr),
       name = update_name(name, bufnr),
       forse_size = nil,
     }
