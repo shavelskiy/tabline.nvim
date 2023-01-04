@@ -24,6 +24,11 @@ local render_with_size = function(parts)
           lenght = lenght - #tmp
         end
 
+        if lenght > 3 then
+          result = result .. '   ' .. parts.icon.close_icon
+          lenght = lenght - 4
+        end
+
         result = result .. string.rep(' ', lenght)
       end
     end
