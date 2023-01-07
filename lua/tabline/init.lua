@@ -1,7 +1,7 @@
 local is_buf_valid = require('tabline.api').is_buf_valid
 
 return {
-  setup = function()
+  setup = function(config)
     -- store listed buffers in tab local var
     vim.t.bufs = vim.api.nvim_list_bufs()
     vim.g.tabline_offset = 0
@@ -45,6 +45,10 @@ return {
         end
       end,
     })
+
+    if config.highlight == true then
+      require 'statusline.highlight'()
+    end
 
     vim.opt.showtabline = 2
     vim.opt.tabline = "%!v:lua.require('tabline.render')()"
