@@ -1,4 +1,4 @@
-local buffer_parts = require 'tabline.buffer_parts'
+local buffer_parts = require 'tabline.buffer.parts'
 local is_buf_valid = require('tabline.api').is_buf_valid
 
 local get_length = function(parts)

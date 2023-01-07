@@ -41,18 +41,15 @@ local update_name = function(name, bufnr)
 end
 
 local get_pick_data = function(bufnr)
-  if vim.g.tabline_show_pick ~= true then
-    return nil
-  end
-
-  local char = '-'
-  for i, buffer in ipairs(vim.t.bufs) do
-    if buffer == bufnr then
-      char = utils.number_to_char(i)
+  if vim.g.tabline_show_pick == true then
+    for i, buffer in ipairs(vim.t.bufs) do
+      if buffer == bufnr then
+        return { hl = '%#TablinePick#', char = utils.number_to_char(i) }
+      end
     end
   end
 
-  return '%#TablinePick#' .. char
+  return nil
 end
 
 local get_highlight = function(bufnr)
@@ -72,7 +69,6 @@ return function(bufnr)
     or ' No Name '
 
   local icon_data = get_icon(name, bufnr)
-  local pick = get_pick_data(bufnr)
 
   name = (#name > 40 and string.sub(name, 1, 30) .. '..') or name
 
@@ -80,8 +76,9 @@ return function(bufnr)
     icon = {
       hl = icon_data.hl,
       icon = icon_data.icon,
-      close_icon = pick ~= nil and pick or vim.bo[bufnr].modified and '' or '',
+      close_icon = vim.bo[bufnr].modified and '' or '',
     },
+    pick = get_pick_data(bufnr),
     hl = get_highlight(bufnr),
     name = update_name(name, bufnr),
     forse_size = nil,

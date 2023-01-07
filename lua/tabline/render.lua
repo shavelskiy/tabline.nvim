@@ -1,5 +1,5 @@
-local buffer_render = require 'tabline.buffer_render'
-local buffer_list = require 'tabline.buffer_list'
+local buffer_render = require 'tabline.buffer.render'
+local buffer_list = require 'tabline.buffer.list'
 
 local get_offset = function()
   local result = 0
