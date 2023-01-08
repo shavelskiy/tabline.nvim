@@ -2,6 +2,10 @@ local devicons_present, devicons = pcall(require, 'nvim-web-devicons')
 local is_buf_valid = require('tabline.api').is_buf_valid
 local utils = require 'tabline.utils'
 
+local is_active = function(bufnr)
+  return bufnr == vim.api.nvim_get_current_buf() or vim.fn.bufwinnr(bufnr) ~= -1 and utils.is_from_offset()
+end
+
 local new_hl = function(group1, group2)
   local new_group = 'Tabline' .. group1 .. group2
   vim.api.nvim_set_hl(0, new_group, {
@@ -19,11 +23,7 @@ local get_icon = function(name, bufnr)
   local icon, icon_hl = devicons.get_icon(name, string.match(name, '%a+$'), { default = true })
 
   return {
-    hl = new_hl(
-      icon_hl,
-      (vim.api.nvim_get_current_buf() == bufnr and vim.g.tabline_show_pick ~= true) and 'TablineBufOn'
-        or 'TablineBufOff'
-    ),
+    hl = new_hl(icon_hl, (is_active(bufnr) and vim.g.tabline_show_pick ~= true) and 'TablineBufOn' or 'TablineBufOff'),
     icon = icon,
   }
 end
@@ -57,7 +57,7 @@ local get_highlight = function(bufnr)
     return '%#TablineBufOff#'
   end
 
-  if bufnr == vim.api.nvim_get_current_buf() then
+  if is_active(bufnr) then
     return vim.bo[bufnr].modified and '%#TablineBufOnModified#' or '%#TablineBufOn#'
   end
 

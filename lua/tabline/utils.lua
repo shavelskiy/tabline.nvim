@@ -6,6 +6,10 @@ local separator = package.config:sub(1, 1)
 local chars = 'abcdefghijklmnopqrstuvwxyz'
 
 return {
+  is_from_offset = function()
+    local filetype = vim.bo[vim.api.nvim_win_get_buf(0)].ft
+    return filetype == 'NvimTree'
+  end,
   get_unique_name = function(bufnr, second_bufnr)
     local first = vim.api.nvim_buf_get_name(bufnr)
     local second = vim.api.nvim_buf_get_name(second_bufnr)
