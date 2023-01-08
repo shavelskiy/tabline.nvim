@@ -2,9 +2,10 @@ local buffer_render = require 'tabline.buffer.render'
 local buffer_list = require 'tabline.buffer.list'
 
 local get_offset = function()
-  local result = 0
+  local result, filetype = 0, nil
   for _, win in pairs(vim.api.nvim_tabpage_list_wins(0)) do
-    if vim.bo[vim.api.nvim_win_get_buf(win)].ft == 'NvimTree' then
+    filetype = vim.bo[vim.api.nvim_win_get_buf(win)].ft
+    if filetype == 'NvimTree' or filetype == 'DiffviewFiles' then
       result = result + vim.api.nvim_win_get_width(win) + 1
     end
   end

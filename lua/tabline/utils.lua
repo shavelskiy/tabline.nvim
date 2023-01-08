@@ -8,7 +8,7 @@ local chars = 'abcdefghijklmnopqrstuvwxyz'
 return {
   is_from_offset = function()
     local filetype = vim.bo[vim.api.nvim_win_get_buf(0)].ft
-    return filetype == 'NvimTree'
+    return filetype == 'NvimTree' or filetype == 'DiffviewFiles'
   end,
   get_unique_name = function(bufnr, second_bufnr)
     local first = vim.api.nvim_buf_get_name(bufnr)
